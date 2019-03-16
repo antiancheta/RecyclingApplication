@@ -1,0 +1,109 @@
+#!/usr/bin/python3
+import tkinter
+from tkinter.constants import *
+import time
+import csv
+import sqlite3
+
+tk = tkinter.Tk()
+tk.title("Recycling Application")
+tk.call('wm', 'iconphoto', tk._w, tkinter.PhotoImage(file='pic.ico'))
+
+frame = tkinter.Frame(tk, borderwidth=50,background="#42f486")
+frame.pack(fill=BOTH,expand=2)
+
+label = tkinter.Label(frame, font="Ubuntu", text="Recycling Application",bg="#42f486",fg="#232624")
+label.pack(side=TOP, expand=2)
+
+class Recyclable:
+	def __init__(self):
+		self.glassAmount = 0
+		self.plasticAmount = 0
+		self.aluminumAmount = 0
+		self.amountCollected = 0.00
+		self.totalAmount = 0
+	def glass(self):
+		self.glassAmount = self.glassAmount + 1
+		self.amountCollected += 0.05
+		self.totalAmount = self.totalAmount + 1
+		print("\nAdded a glass recyclable\n")
+		time.sleep(1.25)
+		print("\nGlass Amount: " + str(self.glassAmount) + "\nTotal Amount: " + str(self.totalAmount) + "\nDinero Collected: " + str(self.amountCollected))
+	def plastic(self):
+		self.plasticAmount = self.plasticAmount + 1
+		self.amountCollected = self.amountCollected + 0.05
+		self.totalAmount = self.totalAmount + 1
+		print("\nAdded a plastic recyclable\n")
+		time.sleep(1.25)
+		print("\nPlastic Amount: " + str(self.plasticAmount) + "\nTotal Amount: " + str(self.totalAmount) + "\nDinero Collected: " + str(self.amountCollected))
+	def aluminum(self):
+		self.aluminumAmount = self.aluminumAmount + 1
+		self.amountCollected = self.amountCollected + 0.05
+		self.totalAmount = self.totalAmount + 1
+		print("\nAdded an aluminum recyclable\n")
+		time.sleep(1.25)
+		print("\nAluminum Amount: " + str(self.aluminumAmount) + "\nTotal Amount: " + str(self.totalAmount) + "\nDinero Collected: " + str(self.amountCollected))
+	def startUP(self):
+		database = sqlite3.connect('recycling.db')
+		cursor = database.cursor()
+		try:
+			primary_command = """CREATE TABLE Recyclables(glass_amount varchar(255), plastic_amount varchar(255), aluminum_amount varchar(255), total_amount varchar(255), money_earned varchar(255));"""
+			cursor.execute(primary_command)
+		except:
+			print("\n")
+		dataset = """INSERT INTO Recyclables VALUES (""" + str(self.glassAmount) + """, """ + str(self.plasticAmount) + """, """ + str(self.aluminumAmount) + """, """ + str(self.totalAmount) + """, """ + str(self.amountCollected) + """);"""
+		try:
+			cursor.execute(dataset)
+			database.commit()
+			print("\n\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\nDone!\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n")
+		except:
+			database.rollback()
+			print("\n\nERROR\n\n");
+		database.close()
+
+boi = Recyclable()
+
+def glassRecycle():
+	boi.glass()
+
+def plasticRecycle():
+	boi.plastic()
+
+def aluminumRecycle():
+	boi.aluminum()
+
+def information():
+	boi.startUP()
+
+def save2csv():
+	data = [['Amount of Glass', 'Amount of Plastic', 'Amount of Aluminum', 'Amount Earned'],[str(boi.glassAmount),str(boi.plasticAmount),str(boi.aluminumAmount),str(boi.amountCollected)]]
+	with open('recyclables.csv', 'w') as csvfile:
+    		writer = csv.writer(csvfile)
+    		writer.writerows(data)
+	csvfile.close()
+	time.sleep(1)
+	print("\nDone!\n")
+
+def byebye():
+	print("\n\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\nThank you for recycling!\n\n+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+\n\n")
+	tk.destroy()
+
+button2 = tkinter.Button(frame, font="Ubuntu", text="Glass Recyclable",command=glassRecycle,bg="#42f486",fg="#232624",highlightcolor="#232624",highlightbackground="#232624",activebackground="#232624")
+button2.pack(expand=1)
+
+button3 = tkinter.Button(frame, font="Ubuntu", text="Plastic Recycle",command=plasticRecycle,bg="#42f486",fg="#232624",highlightcolor="#232624",highlightbackground="#232624",activebackground="#232624")
+button3.pack(expand=1)
+
+button4 = tkinter.Button(frame, font="Ubuntu", text="Aluminum Recycle",command=aluminumRecycle,bg="#42f486",fg="#232624",highlightcolor="#232624",highlightbackground="#232624",activebackground="#232624")
+button4.pack(expand=1)
+
+button5 = tkinter.Button(frame, font="Ubuntu", text="Insert into Database",command=information,bg="#42f486",fg="#232624",highlightcolor="#232624",highlightbackground="#232624",activebackground="#232624")
+button5.pack(expand=1)
+
+button6 = tkinter.Button(frame, font="Ubuntu", text="Save to CSV",command=save2csv,bg="#42f486",fg="#232624",highlightcolor="#232624",highlightbackground="#232624",activebackground="#232624")
+button6.pack(side=LEFT, expand=1)
+
+button = tkinter.Button(frame,font="Ubuntu",text="Quit",command=byebye,bg="#42f486",fg="#232624",highlightcolor="#232624",highlightbackground="#232624",activebackground="#232624")
+button.pack(side=LEFT,expand=1)
+
+tk.mainloop()
